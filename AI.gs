@@ -1,6 +1,9 @@
 function getAIEvaluation(deviceData) {
   try {
-    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+    const props = PropertiesService.getScriptProperties();
+    const apiKey = props.getProperty('OPENAI_API_KEY');
+    const model = props.getProperty('OPENAI_MODEL') || 'gpt-4o';
+    const tokenParam = props.getProperty('TOKEN_PARAM') || 'max_tokens';
     if (!apiKey) {
       throw new Error('OpenAI API key not found. Please set it in Script Properties.');
     }
@@ -122,15 +125,9 @@ Provide a valid JSON response with this structure:
 
     // Make API call
     const url = 'https://api.openai.com/v1/chat/completions';
-    const options = {
-      'method': 'post',
-      'headers': {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
-      },
-      'payload': JSON.stringify({
-        'model': 'o3-mini',  // Updated model
-        'messages': [
+    const payload = {
+      'model': model,
+      'messages': [
           {
             'role': 'system',
             'content': systemPrompt
@@ -140,9 +137,17 @@ Provide a valid JSON response with this structure:
             'content': userPrompt
           }
         ],
-        'temperature': 0.7,
-        'max_tokens': 2000
-      })
+      'temperature': 0.7
+    };
+    payload[tokenParam] = 2000;
+
+    const options = {
+      'method': 'post',
+      'headers': {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json'
+      },
+      'payload': JSON.stringify(payload)
     };
 
     options.muteHttpExceptions = true;

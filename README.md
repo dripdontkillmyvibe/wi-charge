@@ -6,9 +6,11 @@ This Google Sheets add‑on evaluates device ideas for use with Wi‑Charge wire
 
 1. Open the spreadsheet and choose **Extensions → Apps Script**.
 2. In **Project Settings**, add a script property named `OPENAI_API_KEY` with your OpenAI key.
-3. (Optional) Enable the **Drive API** in **Services** to allow PDF extraction.
-4. Create a Drive folder named **ReferencePDFs** and place up to five PDF files you want included as reference material.
-5. Save the project and reload the spreadsheet.
+3. (Optional) add `OPENAI_MODEL` to override the default model (`gpt-4o`).
+4. (Optional) add `TOKEN_PARAM` to control which token limit parameter is sent (`max_tokens` or `max_completion_tokens`, defaults to `max_tokens`).
+5. (Optional) Enable the **Drive API** in **Services** to allow PDF extraction.
+6. Create a Drive folder named **ReferencePDFs** and place up to five PDF files you want included as reference material.
+7. Save the project and reload the spreadsheet.
 
 ## Usage
 

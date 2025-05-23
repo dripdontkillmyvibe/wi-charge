@@ -467,21 +467,25 @@ function showAIInfo() {
 function testAIConnection() {
   const ui = SpreadsheetApp.getUi();
   try {
-    const apiKey = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+    const props = PropertiesService.getScriptProperties();
+    const apiKey = props.getProperty('OPENAI_API_KEY');
+    const model = props.getProperty('OPENAI_MODEL') || 'gpt-4o';
+    const tokenParam = props.getProperty('TOKEN_PARAM') || 'max_tokens';
     if (!apiKey) {
       ui.alert('OpenAI API key not found. Set OPENAI_API_KEY in Script Properties.');
       return;
     }
 
     const url = 'https://api.openai.com/v1/chat/completions';
+    const payload = {
+      model: model,
+      messages: [{role: 'user', content: 'Hello'}]
+    };
+    payload[tokenParam] = 1;
     const options = {
       method: 'post',
       headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
-      payload: JSON.stringify({
-        model: 'o3-mini',
-        messages: [{role: 'user', content: 'Hello'}],
-        max_tokens: 1
-      }),
+      payload: JSON.stringify(payload),
       muteHttpExceptions: true
     };
 
