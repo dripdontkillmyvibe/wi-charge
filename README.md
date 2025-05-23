@@ -9,7 +9,7 @@ This Google Sheets add‑on evaluates device ideas for use with Wi‑Charge wire
 3. (Optional) add `OPENAI_MODEL` to override the default model (`gpt-4o`).
 4. (Optional) add `TOKEN_PARAM` to control which token limit parameter is sent (`max_tokens` or `max_completion_tokens`, defaults to `max_tokens`).
 5. (Optional) Enable the **Drive API** in **Services** to allow PDF extraction.
-6. Create a Drive folder named **ReferencePDFs** and place up to five PDF files you want included as reference material.
+6. Create a Drive folder named **ReferencePDFs** and place up to five PDF files you want included as reference material. If this folder is missing, the script logs `ReferencePDFs folder not found` and skips loading reference PDFs.
 7. Save the project and reload the spreadsheet.
 
 ## Usage

@@ -429,6 +429,7 @@ function getReferenceData() {
   const results = [];
   const folderIt = DriveApp.getFoldersByName('ReferencePDFs');
   if (!folderIt.hasNext()) {
+    Logger.log('ReferencePDFs folder not found. No reference data will be included.');
     return results;
   }
   const folder = folderIt.next();
