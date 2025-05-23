@@ -426,6 +426,7 @@ function writeAIResult(result) {
  * @return {Object[]} Array of objects containing file name and extracted text.
  */
 function getReferenceData() {
+  const MAX_CHARS_PER_PDF = 4000; // keep roughly within a few thousand characters
   const results = [];
   const folderIt = DriveApp.getFoldersByName('ReferencePDFs');
   if (!folderIt.hasNext()) {
@@ -440,8 +441,14 @@ function getReferenceData() {
       // Convert PDF to Google Doc to read its text
       const temp = Drive.Files.copy({}, file.getId(), {convert: true});
       const doc = DocumentApp.openById(temp.id);
-      const text = doc.getBody().getText();
+      let text = doc.getBody().getText();
       Drive.Files.remove(temp.id);
+
+      // Truncate to avoid exceeding token limits
+      if (text.length > MAX_CHARS_PER_PDF) {
+        text = text.substring(0, MAX_CHARS_PER_PDF) + '\n...[truncated]';
+      }
+
       results.push({name: file.getName(), text: text});
     } catch (e) {
       results.push({name: file.getName(), text: 'Error extracting text: ' + e.message});
