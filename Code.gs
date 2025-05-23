@@ -7,6 +7,7 @@ function onOpen() {
     .addSeparator()
     .addItem('View Technical Reference', 'showTechReference')
     .addItem('Test AI Connection', 'testAIConnection')
+    .addItem('Reset Results Sheet', 'resetResultsSheet')
     .addItem('About AI Mode', 'showAIInfo')
     .addToUi();
 }
@@ -288,8 +289,7 @@ function addResultHeaders(sheet) {
 function writeAIResult(result) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results');
 
-  // Clear any existing content
-  sheet.clear();
+  // Determine the next available row without clearing previous results
 
   // Write evaluation header
   const lastRow = sheet.getLastRow();
@@ -493,5 +493,19 @@ function testAIConnection() {
     }
   } catch (e) {
     ui.alert('Error testing AI connection: ' + e.message);
+  }
+}
+
+// Reset the Results sheet by clearing all content and formatting
+function resetResultsSheet() {
+  const ui = SpreadsheetApp.getUi();
+  const response = ui.alert('Reset Results Sheet?', 'This will remove all existing results. Continue?', ui.ButtonSet.OK_CANCEL);
+  if (response !== ui.Button.OK) {
+    return;
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results');
+  if (sheet) {
+    sheet.clear();
   }
 }
