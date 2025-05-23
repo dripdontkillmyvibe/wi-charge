@@ -4,13 +4,13 @@ function getAIEvaluation(deviceData) {
     if (!apiKey) {
       throw new Error('OpenAI API key not found. Please set it in Script Properties.');
     }
-    
+
     // Get reference data
     const referenceData = getReferenceData();
-    
+
     // Check if we need research mode
     const needsResearch = !deviceData.avgPower || !deviceData.peakPower || !deviceData.los;
-    
+
     // Build the system prompt with research capabilities
     const systemPrompt = `You are the Wi-Charge Device Evaluation Expert. ${needsResearch ? 'RESEARCH MODE ACTIVATED: You need to research and estimate missing device specifications based on the device name and description provided.' : ''}
 
@@ -84,25 +84,25 @@ Provide a valid JSON response with this structure:
     // Build user prompt with available data
     let userPrompt = `Evaluate this device for Wi-Charge wireless power:\n\n`;
     userPrompt += `Device Name: ${deviceData.name}\n`;
-    
+
     if (deviceData.avgPower) {
       userPrompt += `Average Power: ${deviceData.avgPower} mW\n`;
     } else {
       userPrompt += `Average Power: NOT PROVIDED - Please research and estimate\n`;
     }
-    
+
     if (deviceData.peakPower) {
       userPrompt += `Peak Power: ${deviceData.peakPower} W\n`;
     } else {
       userPrompt += `Peak Power: NOT PROVIDED - Please research and estimate\n`;
     }
-    
+
     if (deviceData.los) {
       userPrompt += `Line of Sight: ${deviceData.los}%\n`;
     } else {
       userPrompt += `Line of Sight: NOT PROVIDED - Please estimate based on typical installation\n`;
     }
-    
+
     if (deviceData.swapsYear) {
       userPrompt += `Battery Swaps/Year: ${deviceData.swapsYear}\n`;
     }
@@ -115,7 +115,7 @@ Provide a valid JSON response with this structure:
     if (deviceData.deviceType) {
       userPrompt += `Device Type: ${deviceData.deviceType}\n`;
     }
-    
+
     if (needsResearch) {
       userPrompt += `\nNOTE: This is a RESEARCH MODE evaluation. Please research the device specifications and provide your best estimates for missing values. Be transparent about what is estimated vs provided.`;
     }
@@ -144,13 +144,19 @@ Provide a valid JSON response with this structure:
         'max_tokens': 2000
       })
     };
-    
+
+    options.muteHttpExceptions = true;
     const response = UrlFetchApp.fetch(url, options);
+
+    if (response.getResponseCode() !== 200) {
+      throw new Error('OpenAI API error: ' + response.getContentText());
+    }
+
     const result = JSON.parse(response.getContentText());
-    
+
     if (result.choices && result.choices[0] && result.choices[0].message) {
       const content = result.choices[0].message.content;
-      
+
       // Try to parse the JSON response
       try {
         // Remove any markdown code blocks if present
@@ -164,9 +170,9 @@ Provide a valid JSON response with this structure:
         throw new Error('AI response was not in the expected format');
       }
     }
-    
+
     throw new Error('Unexpected API response structure');
-    
+
   } catch (error) {
     console.error('AI evaluation error:', error);
     throw error;
