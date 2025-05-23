@@ -15,8 +15,14 @@ function onOpen() {
 // Add this new function
 function showTechReference() {
   const refData = getReferenceData();
-  const message = `
-Wi-Charge Technical Reference
+  let fileNames = refData.map(r => r.name).join('\n');
+  if (fileNames) {
+    fileNames = 'Reference PDFs:\n- ' + fileNames.split('\n').join('\n- ') + '\n\n';
+  } else {
+    fileNames = 'No reference PDFs found.\n\n';
+  }
+
+  const message = `${fileNames}Wi-Charge Technical Reference
 
 TRANSMITTER SPECIFICATIONS:
 - R1: 100mW per device, 1-10m range, 80° FOV
