@@ -50,7 +50,7 @@
   </head>
   <body>
     <h2>🔋 Evaluate Device</h2>
-    
+
     <div class="input-group">
   <label>Device Name: <span style="color: red;">*</span></label>
   <input type="text" id="deviceName" placeholder="e.g., Warehouse Sensor A1">
@@ -65,27 +65,27 @@
   <label>Peak Power (W): <span style="color: #666;">(optional)</span></label>
   <input type="number" id="peakPower" step="0.1" placeholder="e.g., 2.5">
 </div>
-    
+
     <div class="input-group">
       <label>Line of Sight % (0-100):</label>
       <input type="number" id="los" min="0" max="100" placeholder="e.g., 75">
     </div>
-    
+
     <div class="input-group">
       <label>Battery Swaps per Year:</label>
       <input type="number" id="swapsYear" placeholder="e.g., 4">
     </div>
-    
+
     <div class="input-group">
       <label>Cost per Battery Swap ($):</label>
       <input type="number" id="swapCost" placeholder="e.g., 25">
     </div>
-    
+
     <div class="input-group">
       <label>Brief Description:</label>
       <textarea id="description" rows="3" placeholder="Describe the device and use case..."></textarea>
     </div>
-    
+
 <div class="input-group">
   <label>Device Type (Optional):</label>
   <select id="deviceType">
@@ -100,13 +100,13 @@
 </div>
 
     <button onclick="evaluateDevice()">🚀 Run Evaluation</button>
-    
+
     <div class="loading">
       <p>⏳ Evaluating... This may take 30 seconds...</p>
     </div>
-    
+
     <div class="error" id="errorMsg"></div>
-    
+
     <script>
       function evaluateDevice() {
         // Get all the values from the form
@@ -123,29 +123,29 @@ deviceType: document.getElementById('deviceType').value,
 
 // Add a note to the data object about missing fields
   data.hasPartialInfo = !data.avgPower || !data.peakPower || !data.los;
-  
+
         // Check if required fields are filled
 if (!data.name) {
   showError('Please enter at least a device name');
   return;
 }
-        
+
         // Show loading message
         document.querySelector('.loading').style.display = 'block';
         document.querySelector('button').disabled = true;
         hideError();
-        
+
         // Send to Google Apps Script
         google.script.run
           .withSuccessHandler(onSuccess)
           .withFailureHandler(onFailure)
           .processEvaluation(data);
       }
-      
+
       function onSuccess(result) {
         document.querySelector('.loading').style.display = 'none';
         document.querySelector('button').disabled = false;
-        
+
         // Clear the form
         document.getElementById('deviceName').value = '';
         document.getElementById('avgPower').value = '';
@@ -154,21 +154,21 @@ if (!data.name) {
         document.getElementById('swapsYear').value = '';
         document.getElementById('swapCost').value = '';
         document.getElementById('description').value = '';
-        
+
         alert('✅ Evaluation complete! Check the Results sheet.');
       }
-      
+
       function onFailure(error) {
         document.querySelector('.loading').style.display = 'none';
         document.querySelector('button').disabled = false;
         showError('Error: ' + error.message);
       }
-      
+
       function showError(message) {
         document.getElementById('errorMsg').textContent = message;
         document.getElementById('errorMsg').style.display = 'block';
       }
-      
+
       function hideError() {
         document.getElementById('errorMsg').style.display = 'none';
       }
