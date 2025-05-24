@@ -143,10 +143,11 @@ function processEvaluation(data) {
       }
     }
 
-    // Write the AI-powered results
-    writeAIResult(aiEvaluation);
+    // Write the AI-powered results and history
+    const sheetName = writeAIResult(aiEvaluation);
+    appendEvaluationHistory(aiEvaluation);
 
-    return { success: true };
+    return { success: true, sheetName: sheetName };
 
   } catch (error) {
     // If AI fails, fall back to simple evaluation
@@ -352,13 +353,22 @@ function addResultHeaders(sheet) {
 
 // COMPLETELY REVISED writeAIResult function
 function writeAIResult(result) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results');
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  // Determine the next available row without clearing previous results
+  // Build a unique sheet name based on device and timestamp
+  const baseName = result.deviceName.substring(0, 40);
+  const ts = Utilities.formatDate(new Date(), ss.getSpreadsheetTimeZone(), 'yyyyMMdd_HHmmss');
+  let sheetName = baseName + ' ' + ts;
+  sheetName = sheetName.replace(/[\[\]\?:*\/\\]/g, '');
 
-  // Write evaluation header
-  const lastRow = sheet.getLastRow();
-  const newRow = lastRow + 1;
+  const sheet = ss.insertSheet(sheetName);
+  ss.setActiveSheet(sheet);
+
+  // Start writing the report at the top of the new sheet
+  const newRow = 1;
+
+  // Freeze title and device rows for easier scrolling
+  sheet.setFrozenRows(2);
 
   // Title
   sheet.getRange(newRow, 1).setValue('🔋 Wi-Charge Evaluation Report');
@@ -377,13 +387,20 @@ function writeAIResult(result) {
 
   sheet.getRange(newRow + 4, 1).setValue('Power Budget:');
   sheet.getRange(newRow + 4, 2).setValue(result.gateResult.powerBudget.pass ? '✅ PASS' : '❌ FAIL');
-  sheet.getRange(newRow + 4, 3, 1, 3).merge();
-  sheet.getRange(newRow + 4, 3).setValue(result.gateResult.powerBudget.details);
+  sheet.getRange(newRow + 4, 5, 1, 2).merge();
+  sheet.getRange(newRow + 4, 5).setValue(result.gateResult.powerBudget.details);
+  sheet.getRange(newRow + 4, 5).setWrap(true);
 
   sheet.getRange(newRow + 5, 1).setValue('Line of Sight:');
   sheet.getRange(newRow + 5, 2).setValue(result.gateResult.lineOfSight.pass ? '✅ PASS' : '❌ FAIL');
-  sheet.getRange(newRow + 5, 3, 1, 3).merge();
-  sheet.getRange(newRow + 5, 3).setValue(result.gateResult.lineOfSight.details);
+  sheet.getRange(newRow + 5, 5, 1, 2).merge();
+  sheet.getRange(newRow + 5, 5).setValue(result.gateResult.lineOfSight.details);
+  sheet.getRange(newRow + 5, 5).setWrap(true);
+
+  // Style the gate results block
+  const gateRange = sheet.getRange(newRow + 3, 1, 3, 6);
+  gateRange.setBackground('#f4f4f4');
+  gateRange.setBorder(true, true, true, true, true, true);
 
   // Scores Table
   sheet.getRange(newRow + 7, 1).setValue('📊 Scoring Analysis');
@@ -393,6 +410,9 @@ function writeAIResult(result) {
   const scoreHeaders = ['Factor', 'Score', 'Weight', 'Weighted', 'Rationale'];
   sheet.getRange(newRow + 8, 1, 1, 5).setValues([scoreHeaders]);
   sheet.getRange(newRow + 8, 1, 1, 5).setFontWeight('bold').setBackground('#e7e7e7');
+
+  // Box the scoring table
+  sheet.getRange(newRow + 8, 1, 9, 5).setBorder(true, true, true, true, true, true);
 
   // Score data
   const scoreRows = [
@@ -491,7 +511,42 @@ function writeAIResult(result) {
 
   // Set column widths for better readability
   sheet.setColumnWidth(1, 150);
+  sheet.setColumnWidth(3, 80); // Weight
+  sheet.setColumnWidth(4, 90); // Weighted
   sheet.setColumnWidth(5, 300);
+
+  return sheetName;
+}
+
+// Append a summary entry to the evaluations_history sheet
+function appendEvaluationHistory(result) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('evaluations_history');
+  if (!sheet) {
+    sheet = ss.insertSheet('evaluations_history');
+    const headers = ['Date', 'Device', 'Total Score', 'Verdict', 'Pain Intensity',
+      'Coverage Geometry', 'Install Leverage', 'Regulatory & Shipping', 'ROI Math',
+      'Fleet Size', 'Strategic Halo', 'Competitive Threat'];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  }
+
+  const row = [
+    new Date(),
+    result.deviceName,
+    result.totalScore,
+    result.verdict,
+    result.scores.painIntensity.score,
+    result.scores.coverageGeometry.score,
+    result.scores.installLeverage.score,
+    result.scores.regulatoryShipping.score,
+    result.scores.roiMath.score,
+    result.scores.fleetSize.score,
+    result.scores.strategicHalo.score,
+    result.scores.competitiveThreat.score
+  ];
+
+  sheet.appendRow(row);
 }
 
 /**
