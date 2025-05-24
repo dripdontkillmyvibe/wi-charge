@@ -86,16 +86,16 @@ function getSettings() {
   const props = PropertiesService.getScriptProperties();
   return {
     weights: {
-      painIntensity: parseFloat(props.getProperty('WEIGHT_PAIN_INTENSITY')) || 0.15,
-      coverageGeometry: parseFloat(props.getProperty('WEIGHT_COVERAGE_GEOMETRY')) || 0.15,
-      installLeverage: parseFloat(props.getProperty('WEIGHT_INSTALL_LEVERAGE')) || 0.10,
-      regulatoryShipping: parseFloat(props.getProperty('WEIGHT_REGULATORY_SHIPPING')) || 0.10,
-      roiMath: parseFloat(props.getProperty('WEIGHT_ROI_MATH')) || 0.15,
-      fleetSize: parseFloat(props.getProperty('WEIGHT_FLEET_SIZE')) || 0.15,
-      strategicHalo: parseFloat(props.getProperty('WEIGHT_STRATEGIC_HALO')) || 0.10,
-      competitiveThreat: parseFloat(props.getProperty('WEIGHT_COMPETITIVE_THREAT')) || 0.10
+      painIntensity: parseFloat(props.getProperty('WEIGHT_PAIN')) || 0.15,
+      coverageGeometry: parseFloat(props.getProperty('WEIGHT_COVERAGE')) || 0.15,
+      installLeverage: parseFloat(props.getProperty('WEIGHT_INSTALL')) || 0.10,
+      regulatoryShipping: parseFloat(props.getProperty('WEIGHT_REGULATORY')) || 0.10,
+      roiMath: parseFloat(props.getProperty('WEIGHT_ROI')) || 0.15,
+      fleetSize: parseFloat(props.getProperty('WEIGHT_FLEET')) || 0.15,
+      strategicHalo: parseFloat(props.getProperty('WEIGHT_HALO')) || 0.10,
+      competitiveThreat: parseFloat(props.getProperty('WEIGHT_THREAT')) || 0.10
     },
-    continueOnFail: props.getProperty('CONTINUE_ON_FAIL') === 'true'
+    continueOnFail: props.getProperty('ALLOW_CONTINUE') === 'true'
   };
 }
 
@@ -105,15 +105,15 @@ function getSettingsForUI() {
 
 function saveSettings(settings) {
   const props = PropertiesService.getScriptProperties();
-  props.setProperty('WEIGHT_PAIN_INTENSITY', settings.weights.painIntensity);
-  props.setProperty('WEIGHT_COVERAGE_GEOMETRY', settings.weights.coverageGeometry);
-  props.setProperty('WEIGHT_INSTALL_LEVERAGE', settings.weights.installLeverage);
-  props.setProperty('WEIGHT_REGULATORY_SHIPPING', settings.weights.regulatoryShipping);
-  props.setProperty('WEIGHT_ROI_MATH', settings.weights.roiMath);
-  props.setProperty('WEIGHT_FLEET_SIZE', settings.weights.fleetSize);
-  props.setProperty('WEIGHT_STRATEGIC_HALO', settings.weights.strategicHalo);
-  props.setProperty('WEIGHT_COMPETITIVE_THREAT', settings.weights.competitiveThreat);
-  props.setProperty('CONTINUE_ON_FAIL', settings.continueOnFail ? 'true' : 'false');
+  props.setProperty('WEIGHT_PAIN', settings.weights.painIntensity);
+  props.setProperty('WEIGHT_COVERAGE', settings.weights.coverageGeometry);
+  props.setProperty('WEIGHT_INSTALL', settings.weights.installLeverage);
+  props.setProperty('WEIGHT_REGULATORY', settings.weights.regulatoryShipping);
+  props.setProperty('WEIGHT_ROI', settings.weights.roiMath);
+  props.setProperty('WEIGHT_FLEET', settings.weights.fleetSize);
+  props.setProperty('WEIGHT_HALO', settings.weights.strategicHalo);
+  props.setProperty('WEIGHT_THREAT', settings.weights.competitiveThreat);
+  props.setProperty('ALLOW_CONTINUE', settings.continueOnFail ? 'true' : 'false');
 }
 
 function saveSettingsFromUI(settings) {
