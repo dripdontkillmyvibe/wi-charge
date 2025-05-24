@@ -8,8 +8,9 @@ function getAIEvaluation(deviceData) {
       throw new Error('OpenAI API key not found. Please set it in Script Properties.');
     }
 
-    // Get reference data
+    // Get reference data and user settings
     const referenceData = getReferenceData();
+    const settings = getSettings();
 
     // Check if we need research mode
     const needsResearch = !deviceData.avgPower || !deviceData.peakPower || !deviceData.los;
@@ -42,20 +43,20 @@ EVALUATION FRAMEWORK:
 2. Line-of-Sight: Needs >40% unobstructed time
 
 # Scoring Factors (1=weak/blocker, 2=workable, 3=strong)
-1. Pain Intensity (15%): How painful/costly is current solution?
-2. Coverage Geometry (15%): How well does omnidirectional coverage help?
-3. Install Leverage (10%): How easy to deploy transmitters?
-4. Regulatory & Shipping (10%): Complexity of compliance?
-5. ROI Math (15%): Do savings justify costs?
-6. Fleet Size (15%): How many devices benefit?
-7. Strategic Halo (10%): Deeper benefits/differentiation?
-8. Competitive Threat (10%): Risk if competitors get wireless power?
+1. Pain Intensity (${Math.round(settings.weights.painIntensity*100)}%): How painful/costly is current solution?
+2. Coverage Geometry (${Math.round(settings.weights.coverageGeometry*100)}%): How well does omnidirectional coverage help?
+3. Install Leverage (${Math.round(settings.weights.installLeverage*100)}%): How easy to deploy transmitters?
+4. Regulatory & Shipping (${Math.round(settings.weights.regulatoryShipping*100)}%): Complexity of compliance?
+5. ROI Math (${Math.round(settings.weights.roiMath*100)}%): Do savings justify costs?
+6. Fleet Size (${Math.round(settings.weights.fleetSize*100)}%): How many devices benefit?
+7. Strategic Halo (${Math.round(settings.weights.strategicHalo*100)}%): Deeper benefits/differentiation?
+8. Competitive Threat (${Math.round(settings.weights.competitiveThreat*100)}%): Risk if competitors get wireless power?
 
 # Available Reference Data:
 ${JSON.stringify(referenceData, null, 2)}
 
 # Output Format:
-Provide a valid JSON response with this structure:
+Provide a valid JSON response with this structure. Include an "overview" field summarizing market context and ROI in short bullets.
 {
   "deviceName": "string",
   "gateResult": {
@@ -63,19 +64,20 @@ Provide a valid JSON response with this structure:
     "lineOfSight": {"pass": boolean, "details": "string"}
   },
   "scores": {
-    "painIntensity": {"score": 1-3, "weight": 0.15, "weighted": number, "reason": "string"},
-    "coverageGeometry": {"score": 1-3, "weight": 0.15, "weighted": number, "reason": "string"},
-    "installLeverage": {"score": 1-3, "weight": 0.10, "weighted": number, "reason": "string"},
-    "regulatoryShipping": {"score": 1-3, "weight": 0.10, "weighted": number, "reason": "string"},
-    "roiMath": {"score": 1-3, "weight": 0.15, "weighted": number, "reason": "string"},
-    "fleetSize": {"score": 1-3, "weight": 0.15, "weighted": number, "reason": "string"},
-    "strategicHalo": {"score": 1-3, "weight": 0.10, "weighted": number, "reason": "string"},
-    "competitiveThreat": {"score": 1-3, "weight": 0.10, "weighted": number, "reason": "string"}
+    "painIntensity": {"score": 1-3, "weight": ${settings.weights.painIntensity}, "weighted": number, "reason": "string"},
+    "coverageGeometry": {"score": 1-3, "weight": ${settings.weights.coverageGeometry}, "weighted": number, "reason": "string"},
+    "installLeverage": {"score": 1-3, "weight": ${settings.weights.installLeverage}, "weighted": number, "reason": "string"},
+    "regulatoryShipping": {"score": 1-3, "weight": ${settings.weights.regulatoryShipping}, "weighted": number, "reason": "string"},
+    "roiMath": {"score": 1-3, "weight": ${settings.weights.roiMath}, "weighted": number, "reason": "string"},
+    "fleetSize": {"score": 1-3, "weight": ${settings.weights.fleetSize}, "weighted": number, "reason": "string"},
+    "strategicHalo": {"score": 1-3, "weight": ${settings.weights.strategicHalo}, "weighted": number, "reason": "string"},
+    "competitiveThreat": {"score": 1-3, "weight": ${settings.weights.competitiveThreat}, "weighted": number, "reason": "string"}
   },
   "totalScore": number,
   "verdict": "string (Advance/Needs creativity/Park)",
   "topRisks": ["risk1", "risk2", "risk3"],
   "recommendations": ["specific transmitter model", "mounting suggestion", "use case reference"],
+  "overview": "string with bullet-style business case summary",
   "estimatedValues": ${needsResearch ? '{' : 'null'}
     ${needsResearch ? '"avgPower": "estimated value with unit",' : ''}
     ${needsResearch ? '"peakPower": "estimated value with unit",' : ''}

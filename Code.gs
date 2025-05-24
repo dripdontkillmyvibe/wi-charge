@@ -7,6 +7,7 @@ function onOpen() {
     .addSeparator()
     .addItem('View Technical Reference', 'showTechReference')
     .addItem('Test AI Connection', 'testAIConnection')
+    .addItem('Settings', 'showSettings')
     .addItem('Reset Results Sheet', 'resetResultsSheet')
     .addItem('About AI Mode', 'showAIInfo')
     .addToUi();
@@ -72,16 +73,64 @@ Pass threshold: Total score ≥ 27
   SpreadsheetApp.getUi().alert('How to Use', message, SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
+// Display settings sidebar for weight customization
+function showSettings() {
+  const html = HtmlService.createHtmlOutputFromFile('Settings')
+    .setTitle('Evaluation Settings')
+    .setWidth(300);
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+// Retrieve settings from script properties
+function getSettings() {
+  const props = PropertiesService.getScriptProperties();
+  return {
+    weights: {
+      painIntensity: parseFloat(props.getProperty('WEIGHT_PAIN_INTENSITY')) || 0.15,
+      coverageGeometry: parseFloat(props.getProperty('WEIGHT_COVERAGE_GEOMETRY')) || 0.15,
+      installLeverage: parseFloat(props.getProperty('WEIGHT_INSTALL_LEVERAGE')) || 0.10,
+      regulatoryShipping: parseFloat(props.getProperty('WEIGHT_REGULATORY_SHIPPING')) || 0.10,
+      roiMath: parseFloat(props.getProperty('WEIGHT_ROI_MATH')) || 0.15,
+      fleetSize: parseFloat(props.getProperty('WEIGHT_FLEET_SIZE')) || 0.15,
+      strategicHalo: parseFloat(props.getProperty('WEIGHT_STRATEGIC_HALO')) || 0.10,
+      competitiveThreat: parseFloat(props.getProperty('WEIGHT_COMPETITIVE_THREAT')) || 0.10
+    },
+    continueOnFail: props.getProperty('CONTINUE_ON_FAIL') === 'true'
+  };
+}
+
+function getSettingsForUI() {
+  return getSettings();
+}
+
+function saveSettings(settings) {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('WEIGHT_PAIN_INTENSITY', settings.weights.painIntensity);
+  props.setProperty('WEIGHT_COVERAGE_GEOMETRY', settings.weights.coverageGeometry);
+  props.setProperty('WEIGHT_INSTALL_LEVERAGE', settings.weights.installLeverage);
+  props.setProperty('WEIGHT_REGULATORY_SHIPPING', settings.weights.regulatoryShipping);
+  props.setProperty('WEIGHT_ROI_MATH', settings.weights.roiMath);
+  props.setProperty('WEIGHT_FLEET_SIZE', settings.weights.fleetSize);
+  props.setProperty('WEIGHT_STRATEGIC_HALO', settings.weights.strategicHalo);
+  props.setProperty('WEIGHT_COMPETITIVE_THREAT', settings.weights.competitiveThreat);
+  props.setProperty('CONTINUE_ON_FAIL', settings.continueOnFail ? 'true' : 'false');
+}
+
+function saveSettingsFromUI(settings) {
+  saveSettings(settings);
+}
+
 // This is the UPDATED main evaluation function that uses AI
 function processEvaluation(data) {
   try {
+    const settings = getSettings();
     // Use ChatGPT for evaluation
     const aiEvaluation = getAIEvaluation(data);
 
     // Check if it passed the gate
     const gatePassed = aiEvaluation.gateResult.powerBudget.pass && aiEvaluation.gateResult.lineOfSight.pass;
 
-    if (!gatePassed) {
+    if (!gatePassed && !settings.continueOnFail) {
       const gateReason = !aiEvaluation.gateResult.powerBudget.pass ?
         aiEvaluation.gateResult.powerBudget.details :
         aiEvaluation.gateResult.lineOfSight.details;
@@ -100,7 +149,8 @@ function processEvaluation(data) {
 
     // Use the original simple evaluation
     const gateCheck = checkShowStoppers(data);
-    if (!gateCheck.pass) {
+    const settings = getSettings();
+    if (!gateCheck.pass && !settings.continueOnFail) {
       writeFailedResult(data, gateCheck.reason);
       return { success: true };
     }
@@ -387,10 +437,19 @@ function writeAIResult(result) {
     sheet.getRange(newRow + 23, 2).setValue(result.recommendations.join('\n'));
     sheet.getRange(newRow + 23, 2).setWrap(true);
   }
+  // Overview
+  if (result.overview) {
+    sheet.getRange(newRow + 25, 1).setValue("📄 Overview:");
+    sheet.getRange(newRow + 25, 1).setFontWeight("bold");
+    sheet.getRange(newRow + 25, 2, 1, 4).merge();
+    sheet.getRange(newRow + 25, 2).setValue(result.overview);
+    sheet.getRange(newRow + 25, 2).setWrap(true);
+  }
+
 
   // Estimated Values (if present)
   if (result.estimatedValues) {
-    const estimatedRow = newRow + 25;
+    const estimatedRow = newRow + 27;
     sheet.getRange(estimatedRow, 1).setValue('📊 Estimated Values:');
     sheet.getRange(estimatedRow, 1).setFontWeight('bold');
     sheet.getRange(estimatedRow, 1).setBackground('#FFF3CD'); // Light yellow

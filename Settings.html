@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {font-family: Arial, sans-serif; padding: 15px;}
+      .input-group {margin-bottom: 12px;}
+      label {display:block;margin-bottom:4px;font-weight:bold;}
+      input[type=number] {width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;}
+      button {background:#4CAF50;color:white;border:none;border-radius:4px;padding:10px;width:100%;cursor:pointer;}
+      button:hover {background:#45a049;}
+    </style>
+  </head>
+  <body>
+    <h2>⚙️ Evaluation Settings</h2>
+    <div class="input-group">
+      <label>Pain Intensity Weight (%)</label>
+      <input type="number" id="wPain" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>Coverage Geometry Weight (%)</label>
+      <input type="number" id="wCoverage" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>Install Leverage Weight (%)</label>
+      <input type="number" id="wInstall" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>Regulatory & Shipping Weight (%)</label>
+      <input type="number" id="wRegulatory" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>ROI Math Weight (%)</label>
+      <input type="number" id="wROI" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>Fleet Size Weight (%)</label>
+      <input type="number" id="wFleet" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>Strategic Halo Weight (%)</label>
+      <input type="number" id="wHalo" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label>Competitive Threat Weight (%)</label>
+      <input type="number" id="wThreat" min="0" max="100" step="1">
+    </div>
+    <div class="input-group">
+      <label><input type="checkbox" id="continueFail"> Continue even if gate checks fail</label>
+    </div>
+    <button onclick="save()">Save Settings</button>
+    <div id="status" style="margin-top:10px;color:green;"></div>
+    <script>
+      function load() {
+        google.script.run.withSuccessHandler(function(s){
+          document.getElementById('wPain').value = s.weights.painIntensity*100;
+          document.getElementById('wCoverage').value = s.weights.coverageGeometry*100;
+          document.getElementById('wInstall').value = s.weights.installLeverage*100;
+          document.getElementById('wRegulatory').value = s.weights.regulatoryShipping*100;
+          document.getElementById('wROI').value = s.weights.roiMath*100;
+          document.getElementById('wFleet').value = s.weights.fleetSize*100;
+          document.getElementById('wHalo').value = s.weights.strategicHalo*100;
+          document.getElementById('wThreat').value = s.weights.competitiveThreat*100;
+          document.getElementById('continueFail').checked = s.continueOnFail;
+        }).getSettingsForUI();
+      }
+      function save() {
+        var settings = {
+          weights: {
+            painIntensity: parseFloat(document.getElementById('wPain').value)/100 || 0,
+            coverageGeometry: parseFloat(document.getElementById('wCoverage').value)/100 || 0,
+            installLeverage: parseFloat(document.getElementById('wInstall').value)/100 || 0,
+            regulatoryShipping: parseFloat(document.getElementById('wRegulatory').value)/100 || 0,
+            roiMath: parseFloat(document.getElementById('wROI').value)/100 || 0,
+            fleetSize: parseFloat(document.getElementById('wFleet').value)/100 || 0,
+            strategicHalo: parseFloat(document.getElementById('wHalo').value)/100 || 0,
+            competitiveThreat: parseFloat(document.getElementById('wThreat').value)/100 || 0
+          },
+          continueOnFail: document.getElementById('continueFail').checked
+        };
+        google.script.run.withSuccessHandler(function(){
+          document.getElementById('status').textContent = 'Saved!';
+        }).saveSettingsFromUI(settings);
+      }
+      load();
+    </script>
+  </body>
+</html>
