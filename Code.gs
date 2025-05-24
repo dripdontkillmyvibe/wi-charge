@@ -364,6 +364,12 @@ function writeAIResult(result) {
   const sheet = ss.insertSheet(sheetName);
   ss.setActiveSheet(sheet);
 
+
+  // Freeze title and device rows for easier scrolling
+  sheet.setFrozenRows(2);
+
+=======
+
   // Start writing the report at the top of the new sheet
   const newRow = 1;
 
@@ -384,13 +390,20 @@ function writeAIResult(result) {
 
   sheet.getRange(newRow + 4, 1).setValue('Power Budget:');
   sheet.getRange(newRow + 4, 2).setValue(result.gateResult.powerBudget.pass ? '✅ PASS' : '❌ FAIL');
-  sheet.getRange(newRow + 4, 3, 1, 3).merge();
-  sheet.getRange(newRow + 4, 3).setValue(result.gateResult.powerBudget.details);
+  sheet.getRange(newRow + 4, 5, 1, 2).merge();
+  sheet.getRange(newRow + 4, 5).setValue(result.gateResult.powerBudget.details);
+  sheet.getRange(newRow + 4, 5).setWrap(true);
 
   sheet.getRange(newRow + 5, 1).setValue('Line of Sight:');
   sheet.getRange(newRow + 5, 2).setValue(result.gateResult.lineOfSight.pass ? '✅ PASS' : '❌ FAIL');
-  sheet.getRange(newRow + 5, 3, 1, 3).merge();
-  sheet.getRange(newRow + 5, 3).setValue(result.gateResult.lineOfSight.details);
+  sheet.getRange(newRow + 5, 5, 1, 2).merge();
+  sheet.getRange(newRow + 5, 5).setValue(result.gateResult.lineOfSight.details);
+  sheet.getRange(newRow + 5, 5).setWrap(true);
+
+  // Style gate results block
+  const gateRange = sheet.getRange(newRow + 3, 1, 3, 6);
+  gateRange.setBackground('#f0f0f0');
+  gateRange.setBorder(true, true, true, true, true, true);
 
   // Scores Table
   sheet.getRange(newRow + 7, 1).setValue('📊 Scoring Analysis');
@@ -415,6 +428,11 @@ function writeAIResult(result) {
 
   sheet.getRange(newRow + 9, 1, 8, 5).setValues(scoreRows);
   sheet.getRange(newRow + 9, 5, 8, 1).setWrap(true);
+  sheet.getRange(newRow + 8, 1, 9, 5).setBorder(true, true, true, true, true, true);
+
+  // Keep weight columns from stretching
+  sheet.setColumnWidth(3, 70);
+  sheet.setColumnWidth(4, 80);
 
   // Total Score
   sheet.getRange(newRow + 18, 1).setValue('TOTAL SCORE:');
@@ -498,6 +516,8 @@ function writeAIResult(result) {
 
   // Set column widths for better readability
   sheet.setColumnWidth(1, 150);
+  sheet.setColumnWidth(3, 70);
+  sheet.setColumnWidth(4, 80);
   sheet.setColumnWidth(5, 300);
 
   return sheetName;

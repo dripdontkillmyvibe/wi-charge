@@ -39,8 +39,6 @@ Each field controls how much that factor influences the final score:
 The checkbox **Continue even if gate checks fail** lets the analysis run to completion even when the power-budget or line-of-sight gate fails.  
 All values are saved as script properties so they persist across sessions.
 
-=======
-
 The report now also includes a brief market overview section summarizing battery challenges, the Wi-Charge angle and ROI in bullet form.
 The AI will extract text from the PDFs in the `ReferencePDFs` folder and combine
 them with online research when building the evaluation. To keep the system
