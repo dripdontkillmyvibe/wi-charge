@@ -155,7 +155,13 @@ if (!data.name) {
         document.getElementById('swapCost').value = '';
         document.getElementById('description').value = '';
 
-        alert('✅ Evaluation complete! Check the Results sheet.');
+        var msg = '✅ Evaluation complete!';
+        if (result && result.sheetName) {
+          msg += ' Sheet "' + result.sheetName + '" was created.';
+        } else {
+          msg += ' Check the spreadsheet for details.';
+        }
+        alert(msg);
       }
 
       function onFailure(error) {
