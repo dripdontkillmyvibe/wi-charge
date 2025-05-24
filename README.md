@@ -18,7 +18,8 @@ This Google Sheets add‑on evaluates device ideas for use with Wi‑Charge wire
 2. Select **Start New Evaluation** and fill in device information. Only the device name is required.
 3. Choose **View Technical Reference** to see transmitter specs or **About AI Mode** for details about the evaluation process.
 4. Run **Test AI Connection** to verify the API key works.
-5. After running an evaluation, results are written to the **Results** sheet.
+5. After running an evaluation, a new sheet containing the full report is created
+   and a summary row is added to the **evaluations_history** sheet.
 
 
 ## Settings
@@ -37,8 +38,6 @@ Each field controls how much that factor influences the final score:
 
 The checkbox **Continue even if gate checks fail** lets the analysis run to completion even when the power-budget or line-of-sight gate fails.  
 All values are saved as script properties so they persist across sessions.
-
-=======
 
 The report now also includes a brief market overview section summarizing battery challenges, the Wi-Charge angle and ROI in bullet form.
 The AI will extract text from the PDFs in the `ReferencePDFs` folder and combine
