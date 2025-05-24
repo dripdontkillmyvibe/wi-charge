@@ -124,18 +124,23 @@ function saveSettingsFromUI(settings) {
 function processEvaluation(data) {
   try {
     const settings = getSettings();
+    const allowContinue = PropertiesService.getScriptProperties()
+                            .getProperty('ALLOW_CONTINUE') === 'true';
+
     // Use ChatGPT for evaluation
     const aiEvaluation = getAIEvaluation(data);
 
     // Check if it passed the gate
     const gatePassed = aiEvaluation.gateResult.powerBudget.pass && aiEvaluation.gateResult.lineOfSight.pass;
 
-    if (!gatePassed && !settings.continueOnFail) {
+    if (!gatePassed) {
       const gateReason = !aiEvaluation.gateResult.powerBudget.pass ?
         aiEvaluation.gateResult.powerBudget.details :
         aiEvaluation.gateResult.lineOfSight.details;
       writeFailedResult(data, gateReason);
-      return { success: true };
+      if (!allowContinue) {
+        return { success: true };
+      }
     }
 
     // Write the AI-powered results
@@ -150,9 +155,13 @@ function processEvaluation(data) {
     // Use the original simple evaluation
     const gateCheck = checkShowStoppers(data);
     const settings = getSettings();
-    if (!gateCheck.pass && !settings.continueOnFail) {
+    const allowContinue = PropertiesService.getScriptProperties()
+                            .getProperty('ALLOW_CONTINUE') === 'true';
+    if (!gateCheck.pass) {
       writeFailedResult(data, gateCheck.reason);
-      return { success: true };
+      if (!allowContinue && !settings.continueOnFail) {
+        return { success: true };
+      }
     }
 
     const scores = calculateScores(data);
