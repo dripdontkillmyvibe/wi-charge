@@ -23,7 +23,20 @@ This Google Sheets add‑on evaluates device ideas for use with Wi‑Charge wire
 
 ## Settings
 
-Use **Wi‑Charge Evaluator → Settings** to tune the weight applied to each scoring factor. The same panel also lets you choose whether the analysis should continue even if the power‑budget or line‑of‑sight gate fails. All values are stored as script properties.
+Open the settings panel from the spreadsheet menu via **Wi‑Charge Evaluator → Settings**.  
+Each field controls how much that factor influences the final score:
+
+* **Pain Intensity Weight (%)** – importance of the battery replacement cost or operational pain.
+* **Coverage Geometry Weight (%)** – how well the device fits the transmitter’s coverage pattern.
+* **Install Leverage Weight (%)** – impact of installation complexity or synergy with existing infrastructure.
+* **Regulatory & Shipping Weight (%)** – hurdles related to compliance and shipping restrictions.
+* **ROI Math Weight (%)** – contribution of the calculated return on investment.
+* **Fleet Size Weight (%)** – relative importance of the number of units that will be deployed.
+* **Strategic Halo Weight (%)** – credit for broader strategic or branding value.
+* **Competitive Threat Weight (%)** – consideration of the competitive landscape.
+
+The checkbox **Continue even if gate checks fail** lets the analysis run to completion even when the power-budget or line-of-sight gate fails.  
+All values are saved as script properties so they persist across sessions.
 
 =======
 
