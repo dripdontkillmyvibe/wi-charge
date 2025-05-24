@@ -364,8 +364,11 @@ function writeAIResult(result) {
   const sheet = ss.insertSheet(sheetName);
   ss.setActiveSheet(sheet);
 
+
   // Freeze title and device rows for easier scrolling
   sheet.setFrozenRows(2);
+
+=======
 
   // Start writing the report at the top of the new sheet
   const newRow = 1;
