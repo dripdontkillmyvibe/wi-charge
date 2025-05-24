@@ -55,7 +55,7 @@ EVALUATION FRAMEWORK:
 ${JSON.stringify(referenceData, null, 2)}
 
 # Output Format:
-Provide a valid JSON response with this structure:
+Provide a valid JSON response with this structure. Include an "overview" field summarizing market context and ROI in short bullets.
 {
   "deviceName": "string",
   "gateResult": {
@@ -76,6 +76,7 @@ Provide a valid JSON response with this structure:
   "verdict": "string (Advance/Needs creativity/Park)",
   "topRisks": ["risk1", "risk2", "risk3"],
   "recommendations": ["specific transmitter model", "mounting suggestion", "use case reference"],
+  "overview": "string with bullet-style business case summary",
   "estimatedValues": ${needsResearch ? '{' : 'null'}
     ${needsResearch ? '"avgPower": "estimated value with unit",' : ''}
     ${needsResearch ? '"peakPower": "estimated value with unit",' : ''}

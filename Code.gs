@@ -387,10 +387,19 @@ function writeAIResult(result) {
     sheet.getRange(newRow + 23, 2).setValue(result.recommendations.join('\n'));
     sheet.getRange(newRow + 23, 2).setWrap(true);
   }
+  // Overview
+  if (result.overview) {
+    sheet.getRange(newRow + 25, 1).setValue("📄 Overview:");
+    sheet.getRange(newRow + 25, 1).setFontWeight("bold");
+    sheet.getRange(newRow + 25, 2, 1, 4).merge();
+    sheet.getRange(newRow + 25, 2).setValue(result.overview);
+    sheet.getRange(newRow + 25, 2).setWrap(true);
+  }
+
 
   // Estimated Values (if present)
   if (result.estimatedValues) {
-    const estimatedRow = newRow + 25;
+    const estimatedRow = newRow + 27;
     sheet.getRange(estimatedRow, 1).setValue('📊 Estimated Values:');
     sheet.getRange(estimatedRow, 1).setFontWeight('bold');
     sheet.getRange(estimatedRow, 1).setBackground('#FFF3CD'); // Light yellow
